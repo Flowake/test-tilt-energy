@@ -11,6 +11,19 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  frontend:
+    build: frontend
+    command:
+      - /bin/sh
+      - -c
+      - |
+        yarn install
+        yarn run dev --host 0.0.0.0
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   backend:
     build: backend
     volumes:
