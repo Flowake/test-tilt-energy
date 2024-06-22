@@ -1,19 +1,19 @@
 import { z } from 'zod';
 
-export const Appliances = [
-	'fridge',
-	'freezer',
-	'washing_machine',
-	'dishwasher',
-	'induction_stove',
-	'tv',
-	'small_light',
-	'big_light'
-] as const;
+export const appliances = {
+	fridge: 'Fridge',
+	freezer: 'Freezer',
+	washing_machine: 'Washing machine',
+	dishwasher: 'Dishwasher',
+	induction_stove: 'Induction stove',
+	tv: 'Television',
+	small_light: 'Small light',
+	big_light: 'Big light'
+} as const;
 
-export type AppliancesType = (typeof Appliances)[keyof typeof Appliances];
+type Appliances = keyof typeof appliances;
 
-function applianceToMinimumKiloWattHours(appliance: AppliancesType) {
+function applianceToMinimumKiloWattHours(appliance: Appliances) {
 	switch (appliance) {
 		case 'fridge':
 			return 2.0 * 6;
@@ -37,8 +37,10 @@ function applianceToMinimumKiloWattHours(appliance: AppliancesType) {
 export const schema = z
 	.object({
 		email: z.string().email('Please enter a valid email.'),
-		appliances: z.array(z.enum(Appliances)).nonempty('Please select at least one appliance.'),
-		total_consumption: z
+		appliances: z
+			.array(z.enum(Object.keys(appliances) as [Appliances, ...Appliances[]]))
+			.nonempty('Please select at least one appliance.'),
+		total_consumption: z.coerce
 			.number()
 			.positive('Please enter a positive number.')
 			.max(75, 'Total consumption should be less than 75 kWh.')

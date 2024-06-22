@@ -1,27 +1,23 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { Field, Control, Label, Description, FieldErrors } from 'formsnap';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import type { PageData } from './$types.js';
-	import { schema, Appliances, type AppliancesType } from '$lib/schema';
-	import { formatApplianceName } from '$lib/helpers';
+	import { schema, appliances, type Appliances } from '$lib/schema';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	export let data: PageData;
 
-	let applianceSelect: AppliancesType;
+	let applianceSelect: Appliances;
 
-	function addAppliance(appliance: AppliancesType) {
-		$formData.appliances = [...$formData.appliances, appliance];
+	function removeApplianceByIndex(index: number) {
+		$formData.appliances = $formData.appliances.filter((_, i) => i !== index);
 	}
 
-	function removeAppliance(appliance: AppliancesType) {
-		let index = $formData.appliances.indexOf(appliance);
-		if (index !== -1) {
-			$formData.appliances = [
-				...$formData.appliances.slice(0, index),
-				...$formData.appliances.slice(index + 1)
-			];
-		}
+	function addAppliance() {
+		$formData.appliances = [...$formData.appliances, applianceSelect.value];
 	}
 
 	const form = superForm(data.form, {
@@ -32,38 +28,50 @@
 </script>
 
 <form method="POST" use:enhance>
-	<Field {form} name="email">
-		<Control let:attrs>
-			<Label>Email</Label>
-			<input {...attrs} type="email" bind:value={$formData.email} />
-		</Control>
-		<FieldErrors />
-	</Field>
-	<Field {form} name="total_consumption">
-		<Control let:attrs>
-			<Label>Total consumption (kWh)</Label>
-			<input {...attrs} type="number" max="75" bind:value={$formData.total_consumption} />
-		</Control>
-		<Description>The total consumption in kWh per day of your household</Description>
-		<FieldErrors />
-	</Field>
-	<Field {form} name="appliances">
-		<Description>Select your appliances</Description>
-		<select id="appliance" bind:this={applianceSelect}>
-			{#each Appliances as appliance}
-				<option value={appliance}>{formatApplianceName(appliance)}</option>
-			{/each}
-		</select>
-		<button type="button" on:click={() => addAppliance(applianceSelect.value)}>Add</button>
-		<ul>
-			{#each $formData.appliances as appliance}
-				<li>
-					{formatApplianceName(appliance)}
-					<button type="button" on:click={() => removeAppliance(appliance)}>Remove</button>
-				</li>
-			{/each}
-		</ul>
-		<FieldErrors />
-	</Field>
-	<button type="submit">Submit</button>
+	<Form.Field {form} name="email">
+		<Form.Control let:attrs>
+			<Form.Label>Email</Form.Label>
+			<Input {...attrs} type="email" bind:value={$formData.email} />
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+	<Form.Field {form} name="total_consumption">
+		<Form.Control let:attrs>
+			<Form.Label>Total consumption (kWh)</Form.Label>
+			<Input {...attrs} type="number" max="75" bind:value={$formData.total_consumption} />
+		</Form.Control>
+		<Form.Description>The total consumption in kWh per day of your household</Form.Description>
+		<Form.FieldErrors />
+	</Form.Field>
+	<Form.Fieldset {form} name="appliances">
+		<Form.Legend>Owned appliances</Form.Legend>
+		<Select.Root
+			selected={applianceSelect}
+			onSelectedChange={(s) => {
+				applianceSelect = s;
+			}}
+		>
+			<Select.Trigger>
+				<Select.Value placeholder="Select an appliance" />
+			</Select.Trigger>
+			<Select.Content>
+				{#each Object.entries(appliances) as [value, label]}
+					<Select.Item {value} {label} />
+				{/each}
+			</Select.Content>
+		</Select.Root>
+		<Button type="button" on:click={addAppliance}>Add Appliance</Button>
+		{#each $formData.appliances as val, i}
+			<Form.ElementField {form} name="appliances[{i}]">
+				<Form.Control>
+					<Form.Label>{appliances[val]}</Form.Label>
+					<Button type="button" on:click={() => removeApplianceByIndex(i)}>Remove appliance</Button>
+				</Form.Control>
+				<Form.Description class="sr-only">Select the appliances you own</Form.Description>
+				<Form.FieldErrors />
+			</Form.ElementField>
+		{/each}
+		<Form.FieldErrors />
+	</Form.Fieldset>
+	<Button type="submit">Submit</Button>
 </form>
