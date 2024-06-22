@@ -4,11 +4,12 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types.js';
 	import { schema, Appliances, type AppliancesType } from '$lib/schema';
+	import { formatApplianceName } from '$lib/utils';
 	import SuperDebug from 'sveltekit-superforms';
 
 	export let data: PageData;
 
-	let applianceSelect;
+	let applianceSelect: AppliancesType;
 
 	function addAppliance(appliance: AppliancesType) {
 		$formData.appliances = [...$formData.appliances, appliance];
@@ -22,24 +23,6 @@
 				...$formData.appliances.slice(index + 1)
 			];
 		}
-	}
-
-	function formatApplianceName(name: string) {
-		return name
-			.split('_')
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ');
-	}
-
-	async function postData() {
-		let response = await fetch('http://localhost:8000', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify($formData)
-		});
-		console.log(response);
 	}
 
 	const form = superForm(data.form, {
@@ -83,6 +66,5 @@
 		</ul>
 		<FieldErrors />
 	</Field>
-	<button type="submit" on:click={postData}>Submit</button>
+	<button type="submit">Submit</button>
 </form>
-<SuperDebug data={$formData} />

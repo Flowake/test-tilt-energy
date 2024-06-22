@@ -2,7 +2,6 @@ import type { PageServerLoad, Actions } from './$types';
 import { schema } from '$lib/schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { message } from 'sveltekit-superforms';
 import { fail, redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
@@ -20,8 +19,11 @@ export const actions: Actions = {
 		}
 
 		// Send the form to the server and retrieve the energy consumption data
-		let response = await fetch('backend:80', {
+		let response = await fetch('http://backend:80/entries/', {
 			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
 			body: JSON.stringify(form.data)
 		});
 
@@ -29,6 +31,8 @@ export const actions: Actions = {
 			return fail(500, { form });
 		}
 
-		return message(form, 'Form posted successfully!');
+		const result = await response.json();
+
+		return redirect(302, `/${result.id}`);
 	}
 };
