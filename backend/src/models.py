@@ -1,4 +1,4 @@
-from sqlalchemy import ARRAY, Column, Integer, String
+from sqlalchemy import ARRAY, Column, Integer, String, Float
 
 from database import Base
 
@@ -8,5 +8,5 @@ class Entry(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String)
-    total_consumption = Column(Integer)
+    total_consumption = Column(Float)
     appliances = Column(ARRAY(String))

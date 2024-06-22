@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class EntryBase(BaseModel):
     email: str
-    total_consumption: int
+    total_consumption: float
     appliances: list[str]
 
 
