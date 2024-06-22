@@ -4,8 +4,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types.js';
 	import { schema, Appliances, type AppliancesType } from '$lib/schema';
-	import { formatApplianceName } from '$lib/utils';
-	import SuperDebug from 'sveltekit-superforms';
+	import { formatApplianceName } from '$lib/helpers';
 
 	export let data: PageData;
 

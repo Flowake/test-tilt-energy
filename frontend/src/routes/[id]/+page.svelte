@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatApplianceName } from '$lib/utils';
+	import { formatApplianceName } from '$lib/helpers';
 	export let data;
 
 	const totalApplianceConsumption: number = Object.values(data.consumption_per_appliance).reduce(
