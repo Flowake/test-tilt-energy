@@ -1,4 +1,4 @@
-from sqlalchemy import ARRAY, Column, Integer, String, Float
+from sqlalchemy import ARRAY, Column, Integer, String, Float, PickleType
 
 from database import Base
 
@@ -10,3 +10,4 @@ class Entry(Base):
     email = Column(String)
     total_consumption = Column(Float)
     appliances = Column(ARRAY(String))
+    consumption_per_appliance = Column(PickleType)

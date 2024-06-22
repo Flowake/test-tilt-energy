@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 import models
@@ -21,16 +21,24 @@ def get_db():
         db.close()
 
 
-@app.post("/entries/", response_model=schemas.Entry)
+@app.post("/entries", response_model=schemas.EntryGet)
 def create_user(entry: schemas.EntryCreate, db: Session = Depends(get_db)):
     if len(entry.appliances) == 0:
         return Response(status_code=400, content="Appliances list cannot be empty")
-    crud.create_entry(db, entry=entry)
+    # We receive kWh and convert it to Wh
     if (
-        output := logic.appliances_to_energy(entry.appliances, entry.total_consumption)
+        output := logic.appliances_to_energy(
+            entry.appliances, entry.total_consumption * 1000
+        )
     ) is None:
         return Response(
             status_code=400,
             content="Impossible to compute the energy consumption per appliance",
         )
-    return JSONResponse(content=output)
+    entry.consumption_per_appliance = output
+    return crud.create_entry(db, entry=entry)
+
+
+@app.get("/entries/{entry_id}", response_model=schemas.EntryGet)
+def read_item(entry_id: int, db: Session = Depends(get_db)):
+    return crud.get_entry(db, entry_id)
