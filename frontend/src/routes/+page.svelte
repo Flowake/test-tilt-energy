@@ -7,7 +7,6 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 
 	export let data: PageData;
 
@@ -34,11 +33,13 @@
 		alt="Company Logo"
 		class="mb-4 h-32"
 	/>
-	<Label class="mb-8 font-bold">Tilt Energy Consumption Calculator</Label>
-	<Label class="mb-4 w-full"
-		>Compute the individual consumption of your appliances by providing the appliances you own and
+	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+		Consumption Calculator
+	</h1>
+	<p class="leading-7 [&:not(:first-child)]:mt-6">
+		Compute the individual consumption of your appliances by providing the appliances you own and
 		the total consumption of your household.
-	</Label>
+	</p>
 	<form method="POST" use:enhance class="w-full rounded border border-gray-300 p-4">
 		<Form.Field {form} name="email">
 			<Form.Control let:attrs>
