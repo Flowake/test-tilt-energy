@@ -5,7 +5,7 @@
 To run the frontend and backend, just run the following command:
 
 ```bash
-docker compose up
+docker compose up -d && docker compose logs -f
 ```
 
 The platform will be available at `http://localhost:3000`.
@@ -30,3 +30,8 @@ long ids to prevent it.
 
 The user email is not returned from any endpoints to prevent leaking
 personal information.
+
+Finally for a given list of appliances and total consumption,
+there might be multiple combinations of individual consumption
+that would result in the same total consumption. In this case,
+the first combination found is returned.
