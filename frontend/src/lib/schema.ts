@@ -13,6 +13,37 @@ export const appliances = {
 
 type Appliances = keyof typeof appliances;
 
+function applianceToCategory(appliance: Appliances): 'F' | 'A' | 'L' {
+	switch (appliance) {
+		case 'fridge':
+			return 'F';
+		case 'freezer':
+			return 'F';
+		case 'washing_machine':
+			return 'A';
+		case 'dishwasher':
+			return 'A';
+		case 'induction_stove':
+			return 'A';
+		case 'tv':
+			return 'L';
+		case 'small_light':
+			return 'L';
+		case 'big_light':
+			return 'L';
+	}
+}
+
+function countApplianceCategory(appliances: Appliances[]): { F: number; A: number; L: number } {
+	const counts = { F: 0, A: 0, L: 0 };
+
+	for (const appliance of appliances) {
+		counts[applianceToCategory(appliance)]++;
+	}
+
+	return counts;
+}
+
 function applianceToMinimumKiloWattHours(appliance: Appliances) {
 	switch (appliance) {
 		case 'fridge':
@@ -46,8 +77,11 @@ export const schema = z
 			.max(75, 'Total consumption should be less than 75 kWh.')
 	})
 	.superRefine(({ appliances, total_consumption }, ctx) => {
+		const catCounts = countApplianceCategory(appliances);
 		const minimumWattHours = appliances.reduce(
-			(acc, appliance) => acc + applianceToMinimumKiloWattHours(appliance),
+			(acc, appliance) =>
+				acc +
+				applianceToMinimumKiloWattHours(appliance) / catCounts[applianceToCategory(appliance)],
 			0
 		);
 		if (total_consumption < minimumWattHours) {
