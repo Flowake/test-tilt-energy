@@ -65,6 +65,15 @@ function applianceToMinimumKiloWattHours(appliance: Appliances) {
 	}
 }
 
+function minimumConsumption(appliances: Appliances[]) {
+	const catCounts = countApplianceCategory(appliances);
+	return appliances.reduce(
+		(acc, appliance) =>
+			acc + applianceToMinimumKiloWattHours(appliance) / catCounts[applianceToCategory(appliance)],
+		0
+	);
+}
+
 export const schema = z
 	.object({
 		email: z.string().email('Please enter a valid email.'),
@@ -77,20 +86,14 @@ export const schema = z
 			.max(75, 'Total consumption should be less than 75 kWh.')
 	})
 	.superRefine(({ appliances, total_consumption }, ctx) => {
-		const catCounts = countApplianceCategory(appliances);
-		const minimumWattHours = appliances.reduce(
-			(acc, appliance) =>
-				acc +
-				applianceToMinimumKiloWattHours(appliance) / catCounts[applianceToCategory(appliance)],
-			0
-		);
+		const minimumWattHours = minimumConsumption(appliances);
 		if (total_consumption < minimumWattHours) {
 			ctx.addIssue({
 				code: 'custom',
 				message:
 					'Total consumption is too low for the selected appliances. It should be at least ' +
 					minimumWattHours +
-					'kWh.',
+					' kWh.',
 				path: ['total_consumption']
 			});
 		}
