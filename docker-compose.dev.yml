@@ -14,14 +14,22 @@ services:
   frontend:
     build:
       context: frontend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
+    command:
+      - /bin/sh
+      - -c
+      - |
+        yarn install
+        yarn run dev --host 0.0.0.0
     ports:
-      - 3000:3000
-    environment:
-      - ORIGIN=http://localhost:3000
-    restart: on-failure
+      - 5173:5173
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   backend:
     build: backend
+    volumes:
+      - ./backend/src:/project/src
     restart: on-failure
 
 volumes:

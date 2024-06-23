@@ -19,7 +19,7 @@ export const actions: Actions = {
 		}
 
 		// Send the form to the server and retrieve the energy consumption data
-		let response = await fetch('http://backend:80/entries/', {
+		const response = await fetch('http://backend:80/entries/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
